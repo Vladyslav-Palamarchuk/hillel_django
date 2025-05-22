@@ -8,6 +8,9 @@ from first_app.models import Employee
 from common.enums import WorkDayEnum
 
 
+
+
+
 class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
@@ -18,6 +21,26 @@ class EmployeeForm(forms.ModelForm):
 
 class SalaryForm(forms.Form):
     employee = forms.ModelChoiceField(queryset=Employee.objects.all())
+
+
+    def clean_employee(self):
+        employee = self.cleaned_data.get('employee')
+        if not employee:
+            raise forms.ValidationError("Поле Employee має бути заповнене!")
+        return employee
+
+    def clean(self):
+        cleaned_data = super().clean()
+        sick_days = cleaned_data.get('sick_days')
+        holiday_days = cleaned_data.get('holiday_days')
+
+        if sick_days and sick_days > 5:
+            raise forms.ValidationError("Кількість лікарняних не має перевищувати 5-ти днів")
+
+        if holiday_days and holiday_days > 3:
+            raise forms.ValidationError("Кількість відпочинку не має перевищувати 3-м дням")
+
+        return cleaned_data
 
 
     def __init__(self, *args, **kwargs):
