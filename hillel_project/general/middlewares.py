@@ -22,3 +22,8 @@ class RequestStatisticMiddleware(MiddlewareMixin):
             stats, is_created = RequestStatistics.objects.get_or_create(user=request.user)
             stats.requests += 1
             stats.save()
+
+    def process_exception(self, request, exception):
+        RequestStatistics.objects.create(exception=True)
+        logger.debug('Exception occurred:{}'.format(exception))
+
