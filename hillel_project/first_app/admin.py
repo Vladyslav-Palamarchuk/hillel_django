@@ -1,6 +1,10 @@
 from django.contrib import admin
 
 from .models import Employee, Department, Position, Experiment, Article
+from .models import Company
+
+
+
 
 
 @admin.register(Employee)
@@ -26,3 +30,11 @@ class PositionAdmin(admin.ModelAdmin):
 @admin.register(Article)
 class ArticleExperiment(admin.ModelAdmin):
     list_display = ("title", "status", "created_at")
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ('name', 'address', 'email', 'tax_code')
+
+    def has_add_permission(self, request):
+        return not Company.objects.exists()

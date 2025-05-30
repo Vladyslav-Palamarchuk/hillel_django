@@ -8,6 +8,8 @@ from first_app.models import Employee
 from first_app.forms import EmployeeForm
 from first_app.utils import is_user_superuser
 from first_app.querysets import examples
+from first_app.models import Company
+
 
 
 @user_passes_test(is_user_superuser)
@@ -52,3 +54,11 @@ def employee_delete(request, pk):
 def queryset_route(request):
     examples()
     return HttpResponse()
+
+
+
+@user_passes_test(is_user_superuser)
+def company_detail(request):
+    company = Company.objects.first()
+    context = {"company": company}
+    return render(request, "company_detail.html", context)
