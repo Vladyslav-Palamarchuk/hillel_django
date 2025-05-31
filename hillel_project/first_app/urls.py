@@ -1,5 +1,8 @@
 from django.urls import path
 from django.views.decorators.cache import cache_page
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 from .views import func_views, generic_views
 
@@ -13,5 +16,7 @@ urlpatterns = [
     path('salary-calculator/', generic_views.SalaryCalculatorView.as_view(), name="salary_calc"),
     path("company/", func_views.company_detail, name="company_detail"),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 

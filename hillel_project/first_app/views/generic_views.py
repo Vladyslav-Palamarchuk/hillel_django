@@ -5,17 +5,24 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, UpdateView, DeleteView, CreateView, FormView, DetailView
+from django.views.generic import ListView, UpdateView, DeleteView, CreateView, FormView, DetailView, TemplateView
 
 from first_app.models import Employee
 from first_app.forms import EmployeeForm
 from first_app.mixins import UserIsAdminMixin
 from first_app.forms import SalaryForm
+from first_app.models import Company
 
 from first_app.salary_calculator import CalculateMonthRateSalary
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.contrib import messages
+from django.shortcuts import redirect
+
 logger = logging.getLogger('default')
 
+@method_decorator(cache_page(180), name="dispatch")
 class EmployeeListView(ListView):
     model = Employee
     template_name = "employee_list.html"
@@ -41,6 +48,14 @@ class EmployeeCreateView(UserIsAdminMixin, CreateView):
     template_name = 'employee_form.html'
     success_url = reverse_lazy('employee_list')
 
+    def form_valid(self, form):
+        messages.success(self.request, "Працівник створено успішно!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Виникла помилка при створенні, спробуйте ще раз!")
+        return super().form_invalid(form)
+
 
 
 class EmployeeUpdateView(UserIsAdminMixin, UpdateView):
@@ -48,6 +63,14 @@ class EmployeeUpdateView(UserIsAdminMixin, UpdateView):
     form_class = EmployeeForm
     template_name = 'employee_form.html'
     success_url = reverse_lazy('employee_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Iнформація про працівника оновлена успішно!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Виникла помилка при оновленні інформації, спробуйте ще раз!")
+        return super().form_invalid(form)
 
 
 class EmployeeDeleteView(UserIsAdminMixin, DeleteView):
@@ -99,5 +122,15 @@ class SalaryCalculatorView(UserIsAdminMixin, FormView):
             template_name=self.template_name,
             context={'form': form, 'calculated_salary': salary}
         )
+
+
+class HomePageView(TemplateView):
+    template_name = 'home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        company = Company.objects.first()
+        context['company_logo'] = company.logo.url if company and company.logo else None
+        return context
 
 

@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Company Details</title>
+</head>
+<body>
+    {% load static %}
+    {% if company_logo %}
+        <img src="{{ company_logo.url }}" alt="Company Logo">
+    {% else %}
+        <img src="{% static 'img/logo.png' %}" alt="Default Logo">
+    {% endif %}
+    <h1>{{ company.name }}</h1>
+    <p>Address: {{ company.address }}</p>
+    <p>Email: {{ company.email }}</p>
+    <p>Tax Code: {{ company.tax_code }}</p>
+</body>
+</html>
